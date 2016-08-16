@@ -11,6 +11,7 @@ use File::Path qw(remove_tree);
 use Text::CSV::Hashify;
 
 sub trim($) { my $t = shift; $t =~ s/\s+$//; $t =~ s/^\s+//; $t; }
+sub nop($) { my $t = shift; return $t}
 
 my $org = {
 
@@ -45,11 +46,11 @@ my @pref;
 foreach my $prefn (keys %$hash_ref) {
     my $pref = $hash_ref->{$prefn};
 
-    my $cidade   = decode( 'utf-8', trim $pref->{cidade} );
+    my $cidade   = nop(trim $pref->{cidade} );
 
-    my $estado   = decode( 'utf-8', trim $pref->{estado} );
-    my $prefeito = decode( 'utf-8', trim $pref->{nome} );
-    my $partido  = decode( 'utf-8', trim $pref->{partido} );
+    my $estado   = nop(trim $pref->{estado} );
+    my $prefeito = nop(trim $pref->{nome} );
+    my $partido  = nop(trim $pref->{partido} );
 
     my $uid = lc( unac_string "$estado-$cidade" );
     $uid =~ s/ /-/g;
