@@ -4,7 +4,7 @@ use utf8;
 use JSON;
 use File::stat;
 use Time::localtime;
-use HTML::TreeBuilder::XPath;
+
 use Text::Unaccent::PurePerl qw/unac_string/;
 use File::Slurp;
 use File::Path qw(remove_tree);
