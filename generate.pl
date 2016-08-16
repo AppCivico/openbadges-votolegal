@@ -22,7 +22,7 @@ my $org = {
 
 };
 # isso aqui que eu acho que ta errado.. se a org é RAPS, isso nao deveria ser badges.votolegal
-my $base = 'http://badges-raps.votolegal.org.br';
+my $base = 'https://badges-raps.votolegal.org.br';
 
 my $badge_raps = {
 
