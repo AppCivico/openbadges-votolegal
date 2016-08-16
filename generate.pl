@@ -8,47 +8,48 @@ use HTML::TreeBuilder::XPath;
 use Text::Unaccent::PurePerl qw/unac_string/;
 use File::Slurp;
 use File::Path qw(remove_tree);
+use Text::CSV::Hashify;
 
 sub trim($) { my $t = shift; $t =~ s/\s+$//; $t =~ s/^\s+//; $t; }
-if ( !-e 'candidatos.html' || time - ( stat('candidatos.html')->mtime ) > 86400 ) {
-    `curl http://cidadessustentaveis.org.br/signatarios-candidatos/ > candidatos.html`;
-}
 
 my $org = {
 
-    "name"  => "Movimento Nossa São Paulo",
-    "image" => "http://www.nossasaopaulo.org.br/sites/default/files/logo_drupal.png",
-    "url"   => "http://www.nossasaopaulo.org.br/",
-    "email" => 'faleconosco@isps.org.br'
+    "name"  => "RAPS",
+    "image" => "https://raw.githubusercontent.com/AppCivico/openbadges-rnsp/master/logo-aplicacao-branco-RAPS.jpg",
+    "url"   => "https://www.raps.org.br/",
+    "email" => 'comunicacao@raps.org.br',
+
 };
-my $base = 'http://badges.nossasaopaulo.org.br';
+# isso aqui que eu acho que ta errado.. se a org é RAPS, isso nao deveria ser badges.votolegal
+my $base = 'http://badges-raps.votolegal.org.br';
 
-my $badge_pcs = {
+my $badge_raps = {
 
-    "name" => "Programa Cidades Sustentáveis",
+    "name" => "RAPS (Rede de Ação Política pela Sustentabilidade)",
     "description" =>
-"Uma realização da Rede Nossa São Paulo, da Rede Social Brasileira por Cidades Justas e Sustentáveis e do Instituto Ethos, o programa oferece uma plataforma que funciona como uma agenda para a sustentabilidade, incorporando de maneira integrada as dimensões social, ambiental, econômica, política e cultural e abordando as diferentes áreas da gestão pública em 12 eixos temáticos. A cada um deles estão associados indicadores, casos exemplares e referências nacionais e internacionais de excelência. Estamos diante da oportunidade de criar um novo padrão de relação dos cidadãos com a política, os candidatos assumindo compromissos concretos e os cidadãos acompanhando os resultados desses compromissos.",
-    "image"    => "http://cidadessustentaveis.org.br/sites/default/files/logo.png",
-    "criteria" => "http://cidadessustentaveis.org.br/institucional/oprograma",
-    "tags"     => ["Cidades Sustentáveis"],
+"A Rede de Ação Política pela Sustentabilidade – RAPS objetiva contribuir para o fortalecimento e o aperfeiçoamento da democracia e das instituições republicanas mediante o apoio à formação de lideranças políticas que colaborem com a transformação do Brasil em um país mais justo, próspero, solidário, democrático e sustentável.",
+    "image"    => "https://raw.githubusercontent.com/AppCivico/openbadges-rnsp/master/logo-aplicacao-branco-RAPS.jpg",
+    "criteria" => "https://www.raps.org.br/lider-raps/",
+    "criteria:2" => "https://www.raps.org.br/jovem-raps/",
+    "criteria:3" => "https://www.raps.org.br/empreendedor-civico/",
+
+    "tags"     => ["RAPS"],
     "issuer"   => "$base/organization.json"
 };
 
-my $tree = HTML::TreeBuilder::XPath->new;
-$tree->parse_file("candidatos.html");
+my $hash_ref = hashify('raps.csv', 'nome');
 
-my @nodes = $tree->findnodes(
-    q{//*[@id='datatable-1']/tbody/tr}    # just a string, not a string containings quotes
-);
 
 use Encode qw/ decode/;
 my @pref;
-foreach my $pref (@nodes) {
+foreach my $prefn (keys %$hash_ref) {
+    my $pref = $hash_ref->{$prefn};
 
-    my $cidade   = decode( 'utf-8', trim $pref->findvalue('td[1]') );
-    my $estado   = decode( 'utf-8', trim $pref->findvalue('td[2]') );
-    my $prefeito = decode( 'utf-8', trim $pref->findvalue('td[3]') );
-    my $partido  = decode( 'utf-8', trim $pref->findvalue('td[4]') );
+    my $cidade   = decode( 'utf-8', trim $pref->{cidade} );
+
+    my $estado   = decode( 'utf-8', trim $pref->{estado} );
+    my $prefeito = decode( 'utf-8', trim $pref->{nome} );
+    my $partido  = decode( 'utf-8', trim $pref->{partido} );
 
     my $uid = lc( unac_string "$estado-$cidade" );
     $uid =~ s/ /-/g;
@@ -58,16 +59,16 @@ foreach my $pref (@nodes) {
         "recipient" => {
             "type"     => "email",
             "hashed"   => JSON::false,
-            "identity" => "$uid\@missing.com"
+            "identity" => trim $pref->{email}
         },
-        "image"                  => "http://cidadessustentaveis.org.br/sites/default/files/logo.png",
-        "evidence"               => "http://www.cidadessustentaveis.org.br/signatarios-candidatos",
+        "image"                  => "https://raw.githubusercontent.com/AppCivico/openbadges-rnsp/master/logo-aplicacao-branco-RAPS.jpg",
+        "evidence"               => trim $pref->{perfil},
         "issuedOn"               => time,
         "nossasaopaulo:partido"  => $partido,
         "nossasaopaulo:prefeito" => $prefeito,
         "nossasaopaulo:estado"   => $estado,
         "nossasaopaulo:cidade"   => $cidade,
-        "badge"                  => "$base/pcs.json",
+        "badge"                  => "$base/raps.json",
         "verify"                 => {
             "type" => "hosted",
             "url"  => "$base/badges/$uid.json"
@@ -85,7 +86,7 @@ if ( @pref > 10 ) {
     mkdir "openbadges/badges";
 
     write_file( "openbadges/organization.json", { binmode => ':raw' }, to_json( $org, { utf8 => 1, pretty => 1 } ) );
-    write_file( "openbadges/pcs.json", { binmode => ':raw' }, to_json( $badge_pcs, { utf8 => 1, pretty => 1 } ) );
+    write_file( "openbadges/raps.json", { binmode => ':raw' }, to_json( $badge_raps, { utf8 => 1, pretty => 1 } ) );
 
     write_file(
         "openbadges/badges/" . $_->{uid} . '.json',
