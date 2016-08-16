@@ -15,7 +15,7 @@ sub trim($) { my $t = shift; $t =~ s/\s+$//; $t =~ s/^\s+//; $t; }
 my $org = {
 
     "name"  => "RAPS",
-    "image" => "https://raw.githubusercontent.com/AppCivico/openbadges-rnsp/master/logo-aplicacao-branco-RAPS.jpg",
+    "image" => "https://raw.githubusercontent.com/AppCivico/openbadges-votolegal/master/logo-aplicacao-branco-RAPS.jpg",
     "url"   => "https://www.raps.org.br/",
     "email" => 'comunicacao@raps.org.br',
 
@@ -28,7 +28,7 @@ my $badge_raps = {
     "name" => "RAPS (Rede de Ação Política pela Sustentabilidade)",
     "description" =>
 "A Rede de Ação Política pela Sustentabilidade – RAPS objetiva contribuir para o fortalecimento e o aperfeiçoamento da democracia e das instituições republicanas mediante o apoio à formação de lideranças políticas que colaborem com a transformação do Brasil em um país mais justo, próspero, solidário, democrático e sustentável.",
-    "image"    => "https://raw.githubusercontent.com/AppCivico/openbadges-rnsp/master/logo-aplicacao-branco-RAPS.jpg",
+    "image"    => "https://raw.githubusercontent.com/AppCivico/openbadges-votolegal/master/logo-aplicacao-branco-RAPS.jpg",
     "criteria" => "https://www.raps.org.br/lider-raps/",
     "criteria:2" => "https://www.raps.org.br/jovem-raps/",
     "criteria:3" => "https://www.raps.org.br/empreendedor-civico/",
@@ -61,7 +61,7 @@ foreach my $prefn (keys %$hash_ref) {
             "hashed"   => JSON::false,
             "identity" => trim $pref->{email}
         },
-        "image"                  => "https://raw.githubusercontent.com/AppCivico/openbadges-rnsp/master/logo-aplicacao-branco-RAPS.jpg",
+        "image"                  => "https://raw.githubusercontent.com/AppCivico/openbadges-votolegal/master/logo-aplicacao-branco-RAPS.jpg",
         "evidence"               => trim $pref->{perfil},
         "issuedOn"               => time,
         "nossasaopaulo:partido"  => $partido,
